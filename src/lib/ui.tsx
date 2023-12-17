@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
 import * as lifecycleEvents from "./lifecycleEvents";
+import copy from "../copy";
 
 const colorRed = "#A25772";
 const colorBlue = "#7C93C3";
@@ -80,13 +81,10 @@ export const getStrategy = (search: string) => {
   const state = params.get("state") || "external_managed";
   const mode = params.get("mode") || "sync";
   return {
-    state: {
-      external_managed: "external via useEffect + useState",
-      external_usesyncexternalstore: "external via useSyncExternalStore",
-      context: "context",
-    }[state],
+    headline: copy.headlines[state],
+    state: copy.names[state],
     mode: mode.toLowerCase(),
-    expectations: strategyExpectations[state][mode.toLowerCase()],
+    expectations: copy.strategies[state][mode.toLowerCase()],
     params: {
       state,
       mode,
@@ -114,21 +112,6 @@ export const Dot = memo(
 );
 
 const dots: any = [1, 2, 3, 4, 5];
-
-const strategyExpectations: any = {
-  external_managed: {
-    concurrent: `In this mode, expect to witness UI tearing. This is because the state is managed externally by the user. When the user updates the state, React will not know about it and will not be able to schedule a render. This is the worst case scenario for UI tearing.`,
-    sync: `In this mode, the render happens all at once so we won't witness tearing.`,
-  },
-  external_usesyncexternalstore: {
-    concurrent: `The UI will not tear but the transition fails to show a pending state. useSyncExternalStore() is incompatible with React transitions.`,
-    sync: `No different than using external state managed by the user in sync mode. Will never tear.`,
-  },
-  context: {
-    concurrent: `UI tearing will never occur because the state is managed internally by React.`,
-    sync: `Also won't tear.`,
-  },
-};
 
 export const App = ({
   ExpensiveDot,
@@ -225,16 +208,7 @@ export const App = ({
             textAlign: "center",
           }}
         >
-          <span
-            style={
-              {
-                // color: "",
-              }
-            }
-          >
-            Current strategy:
-          </span>
-          {" " + currentStrategy.mode + " - " + currentStrategy.state}
+          {currentStrategy.mode + " mode - " + currentStrategy.headline}
         </h3>
       </div>
       <div
@@ -256,57 +230,65 @@ export const App = ({
             style={{
               marginBottom: "10px",
               fontFamily: "monospace",
+              lineHeight: "2.2rem",
             }}
           >
-            The Tale of the Tearable Dots
+            Tearable Dots - visualize tradeoffs between state management
+            strategies in React concurrent mode
           </h1>
+          {copy.about}
           <p
             style={{
               fontFamily: "monospace",
               marginBottom: "10px",
-              lineHeight: "1.8",
-            }}
-          >
-            A demo simulation of the conditions that lead to UI tearing when
-            using the following state management strategies in both sync and
-            concurrent mode:{" "}
-            <span style={{ fontWeight: "bold", textDecoration: "underline" }}>
-              external state managed by by user
-            </span>
-            ,{" "}
-            <span style={{ fontWeight: "bold", textDecoration: "underline" }}>
-              external state managed by React's useSyncExternalStore
-            </span>
-            , and
-            <span style={{ fontWeight: "bold", textDecoration: "underline" }}>
-              {" "}
-              internal state managed by React's context API
-            </span>
-            .
-          </p>
-          <p
-            style={{
-              fontFamily: "monospace",
-              marginBottom: "20px",
+              fontWeight: "bold",
+              opacity: 0.8,
             }}
           >
             Learn more:{" "}
-            <a href="https://interbolt.org/blog/react-ui-tearing/">
+            <a
+              style={{
+                fontFamily: "monospace",
+                marginBottom: "0px",
+              }}
+              href="https://interbolt.org/blog/react-ui-tearing/"
+            >
               https://interbolt.org/blog/react-ui-tearing/
             </a>
           </p>
-          <a
-            href="https://twitter.com/interbolt_colin"
+          <p
             style={{
               fontFamily: "monospace",
               marginBottom: "10px",
+              marginTop: "0px",
+              fontWeight: "bold",
+              opacity: 0.8,
             }}
           >
-            Follow me twitter
+            Twitter:{" "}
+            <a
+              href="https://twitter.com/interbolt_colin"
+              style={{
+                fontFamily: "monospace",
+              }}
+            >
+              @interbolt_colin
+            </a>
+          </p>
+          <a
+            href="https://github.com/interbolt/tearable-dots"
+            style={{
+              fontFamily: "monospace",
+              marginBottom: "10px",
+              fontWeight: "bold",
+              opacity: 0.8,
+            }}
+          >
+            Source code (I'll clean it if people are interested)
           </a>
-
           <h2
             style={{
+              marginTop: "40px",
               marginBottom: "10px",
               fontFamily: "monospace",
             }}
@@ -316,26 +298,18 @@ export const App = ({
                 color: "darkgreen",
               }}
             >
-              Current strategy:
+              Demo below is using:
             </span>
             {" " + currentStrategy.mode + " - " + currentStrategy.state}
           </h2>
-          <p
-            style={{
-              fontFamily: "monospace",
-              marginBottom: "10px",
-              lineHeight: "1.8",
-            }}
-          >
-            {currentStrategy.expectations}
-          </p>
+
           <h2
             style={{
               marginBottom: "20px",
               fontFamily: "monospace",
             }}
           >
-            Change strategy to:
+            Click a link below to change the strategy:
           </h2>
           <div
             style={{
@@ -365,7 +339,7 @@ export const App = ({
                 lineHeight: "1.8",
               }}
             >
-              {strategyExpectations.external_managed.sync}
+              {copy.strategies.external_managed.sync}
             </p>
             <a
               style={{
@@ -386,7 +360,7 @@ export const App = ({
                 lineHeight: "1.8",
               }}
             >
-              {strategyExpectations.external_managed.concurrent}
+              {copy.strategies.external_managed.concurrent}
             </p>
             <a
               style={{
@@ -409,7 +383,7 @@ export const App = ({
                 lineHeight: "1.8",
               }}
             >
-              {strategyExpectations.external_usesyncexternalstore.sync}
+              {copy.strategies.external_usesyncexternalstore.sync}
             </p>
             <a
               style={{
@@ -434,7 +408,7 @@ export const App = ({
                 lineHeight: "1.8",
               }}
             >
-              {strategyExpectations.external_usesyncexternalstore.concurrent}
+              {copy.strategies.external_usesyncexternalstore.concurrent}
             </p>
             <a
               style={{
@@ -455,7 +429,7 @@ export const App = ({
                 lineHeight: "1.8",
               }}
             >
-              {strategyExpectations.context.sync}
+              {copy.strategies.context.sync}
             </p>
             <a
               style={{
@@ -476,7 +450,7 @@ export const App = ({
                 lineHeight: "1.8",
               }}
             >
-              {strategyExpectations.context.concurrent}
+              {copy.strategies.context.concurrent}
             </p>
           </div>
 
@@ -487,11 +461,11 @@ export const App = ({
               lineHeight: "1.8",
             }}
           >
-            <strong>Important: </strong> the most important part of this demo is
-            the lifecycle event log below the dots. It will tell you exactly
-            what is happening with the render lifecyle under the hood.
+            <strong>Important: </strong> the lifecycle events below the dots
+            section will tell you exactly what is happening with the render
+            lifecyle under the hood. When state tearing occurs look out for a
+            spongebob GIF.
           </p>
-
           <div
             style={{
               display: "flex",
@@ -613,7 +587,7 @@ export const App = ({
             >
               Current strategy
             </span>
-            :{" " + currentStrategy.mode + " - " + currentStrategy.state}
+            : {currentStrategy.mode + " mode - " + currentStrategy.headline}
           </span>
           <h2 style={styleEventLogHeader}>Lifecycle Event Log</h2>
         </div>
