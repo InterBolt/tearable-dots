@@ -15,8 +15,8 @@ const styleRedDot = {
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  width: "75px",
-  height: "75px",
+  width: "60px",
+  height: "60px",
   color: "white",
   fontWeight: "bold",
   backgroundColor: colorRed,
@@ -29,8 +29,8 @@ const styleBlueDot = {
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  width: "75px",
-  height: "75px",
+  width: "60px",
+  height: "60px",
   color: "white",
   fontWeight: "bold",
   backgroundColor: colorBlue,
@@ -43,13 +43,12 @@ const styleGhostDot = {
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  width: "75px",
-  height: "75px",
+  width: "60px",
+  height: "60px",
   color: "white",
-  backgroundColor: "white",
+  backgroundColor: "rgba(0, 0, 0, .1)",
   fontFamily: "arial",
   borderRadius: "100%",
-  border: "1px solid gray",
 } as const;
 
 const stylePendingButton = {
@@ -108,7 +107,7 @@ export const Dot = memo(
         }
         className="color-dot"
       >
-        {color}
+        {color === "gray" ? "" : color}
       </div>
     );
   }
@@ -194,12 +193,12 @@ export const App = ({
   return (
     <div
       style={{
-        padding: "30px",
+        padding: "15px",
         paddingTop: "190px",
         display: "flex",
         alignItems: "center",
         flexDirection: "column",
-        width: "calc(100% - 60px)",
+        width: "calc(100% - 30px)",
       }}
     >
       <div
@@ -210,7 +209,7 @@ export const App = ({
           position: "absolute",
           top: 0,
           left: 0,
-          padding: "0px 20px",
+          // padding: "0px 20px",
           width: "100%",
           height: 160,
           background:
@@ -220,6 +219,7 @@ export const App = ({
         <h3
           style={{
             fontSize: 25,
+            margin: "0px 20px",
             fontFamily: "monospace",
             color: "white",
             textAlign: "center",
@@ -568,9 +568,8 @@ export const App = ({
                       <img
                         src="https://media1.tenor.com/m/8gnVs88HeMEAAAAd/spongebob-sandy-cheeks.gif"
                         style={{
-                          width: "350px",
+                          width: "150px",
                           borderRadius: "20px",
-                          marginLeft: "-75px",
                         }}
                       />
                     )}
