@@ -10,27 +10,13 @@ const styleEventLogHeader = {
   whiteSpace: "pre",
 } as const;
 
-const styleExpected = {
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  height: "45px",
-  paddingLeft: "80px",
-  paddingRight: "80px",
-  color: "white",
-  fontWeight: "bold",
-  fontFamily: "arial",
-  borderRadius: "10px",
-} as const;
-
 const styleRedDot = {
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  width: "45px",
-  height: "45px",
+  width: "75px",
+  height: "75px",
   color: "white",
   fontWeight: "bold",
   backgroundColor: colorRed,
@@ -43,8 +29,8 @@ const styleBlueDot = {
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  width: "45px",
-  height: "45px",
+  width: "75px",
+  height: "75px",
   color: "white",
   fontWeight: "bold",
   backgroundColor: colorBlue,
@@ -57,8 +43,8 @@ const styleGhostDot = {
   flexDirection: "column",
   justifyContent: "center",
   alignItems: "center",
-  width: "45px",
-  height: "45px",
+  width: "75px",
+  height: "75px",
   color: "white",
   backgroundColor: "white",
   fontFamily: "arial",
@@ -72,8 +58,9 @@ const stylePendingButton = {
   border: "none",
   color: "white",
   height: 50,
-  width: 300,
-  borderRadius: "30px",
+  width: "100%",
+  fontWeight: "bold",
+  borderRadius: "6px",
   cursor: "not-allowed",
 } as const;
 
@@ -83,8 +70,9 @@ const styleButton = {
   border: "none",
   color: "white",
   height: 50,
-  width: 300,
-  borderRadius: "30px",
+  width: "100%",
+  fontWeight: "bold",
+  borderRadius: "6px",
   cursor: "pointer",
 } as const;
 
@@ -94,10 +82,9 @@ export const getStrategy = (search: string) => {
   const mode = params.get("mode") || "sync";
   return {
     state: {
-      external_managed: "externally managed by user",
-      external_usesyncexternalstore:
-        "externally managed by useSyncExternalStore",
-      context: "internally managed by context",
+      external_managed: "external via useEffect + useState",
+      external_usesyncexternalstore: "external via useSyncExternalStore",
+      context: "context",
     }[state],
     mode: mode.toLowerCase(),
     expectations: strategyExpectations[state][mode.toLowerCase()],
@@ -148,52 +135,108 @@ export const App = ({
   ExpensiveDot,
   pendingTransition,
   onUpdate,
+  onUnsafeUpdate,
   expectedColor,
+  color,
 }: {
   ExpensiveDot: any;
   pendingTransition: boolean;
   onUpdate: () => void;
+  onUnsafeUpdate: () => void;
   expectedColor: "red" | "blue";
+  color: "red" | "blue";
 }) => {
-  const [previousPending, setPreviousPending] = useState(pendingTransition);
-  const [renderKeys, setRenderKeys] = useState(dots);
-
-  useEffect(() => {
-    if (pendingTransition) {
-      if (!previousPending) {
-        setPreviousPending(true);
-      }
-      const interval = setInterval(() => {
-        const randomNum = Math.floor(Math.random() * dots.length);
-        lifecycleEvents.log(
-          `firing state transition to trigger a render in dot #${randomNum + 1}`
-        );
-        setRenderKeys((prev: any) => {
-          const next = [...prev];
-          next[randomNum] = performance.now();
-          return next;
-        });
-      }, 50);
-      return () => clearInterval(interval);
-    } else if (previousPending) {
-      setPreviousPending(false);
-    }
-  }, [pendingTransition]);
-
+  const [init, setInit] = useState(false);
+  const [showGif, setShowGif] = useState(false);
+  const [hideFirstDot, setHideFirstDot] = useState(false);
   const currentStrategy = useMemo(() => {
     return getStrategy(document.location.search);
   }, []);
+
+  useEffect(() => {
+    if (pendingTransition) {
+      setShowGif(false);
+      setHideFirstDot(true);
+      lifecycleEvents.log(
+        `<span style="color: gray;"><span style="color: purple;">unmounting</span> first dot</span>`
+      );
+      setTimeout(() => {
+        onUnsafeUpdate();
+        lifecycleEvents.log(
+          `<span style="color: gray;"><span style="color: red;">tearing attempt</span>: set color to {<span style="color: ${color};">${color}</span>}</span>`
+        );
+      }, 200);
+      setTimeout(() => {
+        setHideFirstDot(false);
+        lifecycleEvents.log(
+          `<span style="color: gray;"><span style="color: purple;">remounting</span> first dot</span>`
+        );
+      }, 700);
+    } else {
+      if (init && currentStrategy.params.state === "external_managed") {
+        setShowGif(true);
+      }
+      setInit(true);
+      lifecycleEvents.log(
+        `<span style="color: gray;"><span style="color: green;">transition</span> complete</span>`
+      );
+    }
+  }, [pendingTransition]);
+
+  const renderedDots = dots.map((key: number) =>
+    hideFirstDot && key === 1 ? (
+      <Dot color="gray" index={key} />
+    ) : (
+      <ExpensiveDot key={key} index={key} />
+    )
+  );
 
   return (
     <div
       style={{
         padding: "30px",
+        paddingTop: "190px",
         display: "flex",
         alignItems: "center",
         flexDirection: "column",
         width: "calc(100% - 60px)",
       }}
     >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          padding: "0px 20px",
+          width: "100%",
+          height: 160,
+          background:
+            "linear-gradient(197deg, rgba(93,115,165,1) 0%, rgba(77,95,134,1) 58%, rgba(39,46,63,1) 100%)",
+        }}
+      >
+        <h3
+          style={{
+            fontSize: 25,
+            fontFamily: "monospace",
+            color: "white",
+            textAlign: "center",
+          }}
+        >
+          <span
+            style={
+              {
+                // color: "",
+              }
+            }
+          >
+            Current strategy:
+          </span>
+          {" " + currentStrategy.mode + " - " + currentStrategy.state}
+        </h3>
+      </div>
       <div
         style={{
           display: "flex",
@@ -211,7 +254,7 @@ export const App = ({
         >
           <h1
             style={{
-              marginBottom: "20px",
+              marginBottom: "10px",
               fontFamily: "monospace",
             }}
           >
@@ -221,32 +264,12 @@ export const App = ({
             style={{
               fontFamily: "monospace",
               marginBottom: "10px",
-            }}
-          >
-            This demo is the product of the following article:{" "}
-            <a href="https://interbolt.org/blog/react-ui-tearing/">
-              https://interbolt.org/blog/react-ui-tearing/
-            </a>
-          </p>
-
-          <h2
-            style={{
-              marginBottom: "10px",
-              fontFamily: "monospace",
-            }}
-          >
-            What is this?
-          </h2>
-          <p
-            style={{
-              fontFamily: "monospace",
-              marginBottom: "10px",
               lineHeight: "1.8",
             }}
           >
-            Simulation of the conditions that lead to UI tearing when using the
-            following state management strategies in both sync and concurrent
-            mode:{" "}
+            A demo simulation of the conditions that lead to UI tearing when
+            using the following state management strategies in both sync and
+            concurrent mode:{" "}
             <span style={{ fontWeight: "bold", textDecoration: "underline" }}>
               external state managed by by user
             </span>
@@ -261,6 +284,26 @@ export const App = ({
             </span>
             .
           </p>
+          <p
+            style={{
+              fontFamily: "monospace",
+              marginBottom: "20px",
+            }}
+          >
+            Learn more:{" "}
+            <a href="https://interbolt.org/blog/react-ui-tearing/">
+              https://interbolt.org/blog/react-ui-tearing/
+            </a>
+          </p>
+          <a
+            href="https://twitter.com/interbolt_colin"
+            style={{
+              fontFamily: "monospace",
+              marginBottom: "10px",
+            }}
+          >
+            Follow me twitter
+          </a>
 
           <h2
             style={{
@@ -268,7 +311,13 @@ export const App = ({
               fontFamily: "monospace",
             }}
           >
-            Current strategy:
+            <span
+              style={{
+                color: "darkgreen",
+              }}
+            >
+              Current strategy:
+            </span>
             {" " + currentStrategy.mode + " - " + currentStrategy.state}
           </h2>
           <p
@@ -297,8 +346,16 @@ export const App = ({
               marginBottom: "10px",
             }}
           >
-            <a href="/?state=external_managed&mode=sync">
-              Externally Managed by User - SYNC
+            <a
+              style={{
+                marginBottom: "-10px",
+              }}
+              href="?state=external_managed&mode=sync"
+            >
+              {getStrategy("?state=external_managed&mode=sync").mode +
+                " mode" +
+                " - " +
+                getStrategy("?state=external_managed&mode=sync").state}
             </a>
             <p
               style={{
@@ -312,11 +369,14 @@ export const App = ({
             </p>
             <a
               style={{
-                marginBottom: 0,
+                marginBottom: "-10px",
               }}
-              href="/?state=external_managed&mode=concurrent"
+              href="?state=external_managed&mode=concurrent"
             >
-              Externally Managed by User - CONCURRENT
+              {getStrategy("?state=external_managed&mode=concurrent").mode +
+                " mode" +
+                " - " +
+                getStrategy("?state=external_managed&mode=concurrent").state}
             </a>
             <p
               style={{
@@ -328,8 +388,18 @@ export const App = ({
             >
               {strategyExpectations.external_managed.concurrent}
             </p>
-            <a href="/?state=external_usesyncexternalstore&mode=sync">
-              External but managed by useSyncExternalStore - SYNC
+            <a
+              style={{
+                marginBottom: "-10px",
+              }}
+              href="?state=external_usesyncexternalstore&mode=sync"
+            >
+              {getStrategy("?state=external_usesyncexternalstore&mode=sync")
+                .mode +
+                " mode" +
+                " - " +
+                getStrategy("?state=external_usesyncexternalstore&mode=sync")
+                  .state}
             </a>
             <p
               style={{
@@ -341,8 +411,20 @@ export const App = ({
             >
               {strategyExpectations.external_usesyncexternalstore.sync}
             </p>
-            <a href="/?state=external_usesyncexternalstore&mode=concurrent">
-              External but managed by useSyncExternalStore - CONCURRENT
+            <a
+              style={{
+                marginBottom: "-10px",
+              }}
+              href="?state=external_usesyncexternalstore&mode=concurrent"
+            >
+              {getStrategy(
+                "?state=external_usesyncexternalstore&mode=concurrent"
+              ).mode +
+                " mode" +
+                " - " +
+                getStrategy(
+                  "?state=external_usesyncexternalstore&mode=concurrent"
+                ).state}
             </a>
             <p
               style={{
@@ -354,8 +436,16 @@ export const App = ({
             >
               {strategyExpectations.external_usesyncexternalstore.concurrent}
             </p>
-            <a href="/?state=context&mode=sync">
-              Managed with Context API - SYNC
+            <a
+              style={{
+                marginBottom: "-10px",
+              }}
+              href="?state=context&mode=sync"
+            >
+              {getStrategy("?state=context&mode=sync").mode +
+                " mode" +
+                " - " +
+                getStrategy("?state=context&mode=sync").state}
             </a>
             <p
               style={{
@@ -367,8 +457,16 @@ export const App = ({
             >
               {strategyExpectations.context.sync}
             </p>
-            <a href="/?state=context&mode=concurrent">
-              Managed with Context API - CONCURRENT
+            <a
+              style={{
+                marginBottom: "-10px",
+              }}
+              href="?state=context&mode=concurrent"
+            >
+              {getStrategy("?state=context&mode=concurrent").mode +
+                " mode" +
+                " - " +
+                getStrategy("?state=context&mode=concurrent").state}
             </a>
             <p
               style={{
@@ -390,8 +488,8 @@ export const App = ({
             }}
           >
             <strong>Important: </strong> the most important part of this demo is
-            the event log. Also when a tearing occurs you should see a gif of
-            spongebob tearing in half.
+            the lifecycle event log below the dots. It will tell you exactly
+            what is happening with the render lifecyle under the hood.
           </p>
 
           <div
@@ -439,9 +537,53 @@ export const App = ({
                     {expectedColor === "blue" ? "red" : "blue"}
                   </button>
                 )}
-                {renderKeys.map((key: boolean, index: number) => (
-                  <ExpensiveDot key={key} index={index} />
-                ))}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "row",
+                    gap: "15px",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      height: "100%",
+                      gap: "20px",
+                      justifyContent: "space-around",
+                      flexDirection: "column",
+                    }}
+                  >
+                    {renderedDots}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                    }}
+                  >
+                    {showGif && (
+                      <img
+                        src="https://media1.tenor.com/m/8gnVs88HeMEAAAAd/spongebob-sandy-cheeks.gif"
+                        style={{
+                          width: "350px",
+                          borderRadius: "20px",
+                          marginLeft: "-75px",
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      marginRight: "20px",
+                    }}
+                  >
+                    <div />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -465,8 +607,14 @@ export const App = ({
               color: "rgba(0, 0, 0, .5)",
             }}
           >
-            Current strategy:
-            {" " + currentStrategy.mode + " - " + currentStrategy.state}
+            <span
+              style={{
+                color: colorGreen,
+              }}
+            >
+              Current strategy
+            </span>
+            :{" " + currentStrategy.mode + " - " + currentStrategy.state}
           </span>
           <h2 style={styleEventLogHeader}>Lifecycle Event Log</h2>
         </div>

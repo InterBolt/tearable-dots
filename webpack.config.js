@@ -13,10 +13,6 @@ module.exports = {
     new webpack.DefinePlugin({
       __DEV__: JSON.stringify(process.env.NODE_ENV !== "production"),
     }),
-    new webpack.EnvironmentPlugin({
-      STATE: process.env.STATE,
-      CONCURRENT_MODE: process.env.CONCURRENT_MODE,
-    }),
     new HtmlWebpackPlugin({
       template: "./public/index.html",
     }),

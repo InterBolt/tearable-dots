@@ -42,22 +42,18 @@ const ExpensiveDot = memo(({ index }: any) => {
   const { useColor } = useStrategy();
 
   lifecycleEvents.log(
-    `<span style="color: gray;">blocking render thread for dot #${
-      index + 1
-    }</span>`
+    `<span style="color: gray;"><span style="color: orange;">blocking</span> begin -</span> dot #${index}`
   );
   const color = useColor();
 
   const start = performance.now();
-  const blockTime = Math.floor(Math.random() * 500);
+  const blockTime = 100 * index;
   while (performance.now() - start < blockTime) {
     // empty
   }
 
   lifecycleEvents.log(
-    `<span style="color: gray;">blocking complete - about to render #${
-      index + 1
-    }</span>`
+    `<span style="color: gray;"><span style="color: orange;">blocking</span> over (rendering immediately after this) -</span> dot #${index}`
   );
 
   return <UI.Dot color={color} index={index} />;
@@ -96,25 +92,14 @@ const App = () => {
     // clear the tearing dialogue alert.
     const nextColor = setupNextColor();
 
-    console.log(nextColor, color);
-
     lifecycleEvents.log(
-      `<span style="color: green;">kicking off transition to <span style="color: ${nextColor};">${nextColor}</span></span>`
+      `<span style="color: green;">transition began to {<span style="color: ${nextColor};">${nextColor}</span>}</span>`
     );
     // This will start a transition and begin work on a render
     // of 10 dots that each simulate blocking work.
     startTransition(() => {
       handleChange(nextColor);
     });
-
-    // To better demonstrate tearing, we'll wait a random amount of time
-    // which should be enough time for part of transitioned state to be rendered.
-    await new Promise((resolve) => setTimeout(resolve, Math.random() * 100));
-
-    lifecycleEvents.log(
-      `<span style="color: red;">unsafely setting color to <span style="color: ${color};">${color}</span></span>`
-    );
-    handleUnsafeChange(color);
   };
 
   return (
@@ -122,7 +107,9 @@ const App = () => {
       pendingTransition={pendingTransition}
       ExpensiveDot={ExpensiveDot}
       onUpdate={handleUpdate}
+      onUnsafeUpdate={() => handleUnsafeChange(color)}
       expectedColor={expectedColor}
+      color={color}
     />
   );
 };

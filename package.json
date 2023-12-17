@@ -1,20 +1,15 @@
 {
-  "name": "daishi-global-state-tearing",
+  "name": "external-state-tearing",
   "description": "Test tearing in React concurrent rendering",
   "author": "Colin Campbell",
   "scripts": {
-    "use-sync-external-store-sync": "CONCURRENT_MODE=false STATE=use_sync_external_store webpack serve --mode=development",
-    "use-sync-external-store-concurrent": "CONCURRENT_MODE=true STATE=use_sync_external_store webpack serve --mode=development",
-    "external-sync": "CONCURRENT_MODE=false STATE=external webpack serve --mode=development",
-    "external-concurrent": "CONCURRENT_MODE=true STATE=external webpack serve --mode=development",
-    "context-sync": "CONCURRENT_MODE=false STATE=context webpack serve --mode=development",
-    "context-concurrent": "CONCURRENT_MODE=true STATE=context webpack serve --mode=development"
+    "start": "webpack serve --mode=development",
+    "build": "cross-env webpack"
   },
   "license": "MIT",
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-query": "^4.0.0-beta.3"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
@@ -51,12 +46,6 @@
             }
           ],
           "@babel/preset-react"
-        ]
-      },
-      "jest": {
-        "plugins": [
-          "@babel/plugin-transform-modules-commonjs",
-          "@babel/plugin-transform-react-jsx"
         ]
       }
     }
