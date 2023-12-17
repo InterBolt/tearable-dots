@@ -3,6 +3,8 @@
   "description": "Test tearing in React concurrent rendering",
   "author": "Colin Campbell",
   "scripts": {
+    "use-sync-external-store-sync": "CONCURRENT_MODE=false STATE=use_sync_external_store webpack serve --mode=development",
+    "use-sync-external-store-concurrent": "CONCURRENT_MODE=true STATE=use_sync_external_store webpack serve --mode=development",
     "external-sync": "CONCURRENT_MODE=false STATE=external webpack serve --mode=development",
     "external-concurrent": "CONCURRENT_MODE=true STATE=external webpack serve --mode=development",
     "context-sync": "CONCURRENT_MODE=false STATE=context webpack serve --mode=development",
@@ -32,6 +34,8 @@
     "html-webpack-plugin": "^5.5.0",
     "http-server": "^14.1.1",
     "npm-run-all": "^4.1.5",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.11.1"
