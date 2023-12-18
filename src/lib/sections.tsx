@@ -170,6 +170,7 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
               padding: "4px 8px",
               color: styles.colorGreen,
               borderRadius: "4px",
+              lineHeight: "2",
               fontSize: 18,
               backgroundColor: "rgba(255, 255, 255, 1)",
             }}
