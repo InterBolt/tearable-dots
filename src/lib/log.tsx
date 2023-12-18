@@ -1,11 +1,11 @@
-const failed: Array<{ message: string; description?: string; time: number }> =
+const failed: Array<{ message: string; description?: string; time: string }> =
   [];
 const retrySuccesses: any = [];
 
 export const containerId = "log-container";
 
 const buildMessage = (
-  time: number,
+  time: string,
   message: string,
   description?: string
 ): string =>
@@ -13,7 +13,8 @@ const buildMessage = (
     description ? ` - ${description}` : ``
   }`;
 
-export const log = (message: string, description?: string) => {
+const log = (message: string, description?: string) => {
+  const time = performance.now().toFixed(0);
   try {
     failed.forEach((item, i) => {
       if (retrySuccesses.includes(i)) return;
@@ -25,11 +26,13 @@ export const log = (message: string, description?: string) => {
       retrySuccesses.push(i);
     });
     const div = document.createElement("div");
-    div.innerHTML = buildMessage(performance.now(), message, description);
+    div.innerHTML = buildMessage(time, message, description);
     div.style.marginBottom = "15px";
     div.style.fontSize = ".9rem";
     document.getElementById(containerId).appendChild(div);
   } catch (err) {
-    failed.push({ message, description, time: performance.now() });
+    failed.push({ message, description, time });
   }
 };
+
+export default log;

@@ -1,15 +1,22 @@
 import React from "react";
 
 const copy = {
+  spongebobGif:
+    "https://media1.tenor.com/m/8gnVs88HeMEAAAAd/spongebob-sandy-cheeks.gif",
+  twitterLink: "https://twitter.com/interbolt_colin",
+  blogLink: "https://interbolt.org/blog/react-ui-tearing/",
+  githubLink: "https://interbolt.org/blog/react-ui-tearing/",
   headlines: {
-    external_managed: "external via useEffect + useState",
-    external_usesyncexternalstore: "external via useSyncExternalStore",
-    context: "context",
+    external_managed: "external store tracked via `useEffect` and `useState`",
+    external_usesyncexternalstore:
+      "external store tracked via useSyncExternalStore",
+    context: "store managed withing React's context API",
   },
   names: {
-    external_managed: "external via useEffect + useState",
-    external_usesyncexternalstore: "external via useSyncExternalStore",
-    context: "context",
+    external_managed: "external store tracked via `useEffect` and `useState`",
+    external_usesyncexternalstore:
+      "external store tracked via useSyncExternalStore",
+    context: "store managed withing React's context API",
   },
   about: (
     <p
@@ -36,18 +43,28 @@ const copy = {
       .
     </p>
   ),
+  supports_transition: {
+    external_managed: true,
+    external_usesyncexternalstore: false,
+    context: true,
+  },
+  will_tear: {
+    external_managed: true,
+    external_usesyncexternalstore: false,
+    context: false,
+  },
   strategies: {
     external_managed: {
-      concurrent: `TODO`,
-      sync: `TODO`,
+      concurrent: `This uses the old way of managing external global state via \`useState\` and \`useEffect\` hooks and will cause tearing. The first dot is rerendered after the store is modified mid-render, resulting in the first dot using a version of the store that is inconsistent with the other dots.`,
+      sync: `This uses the old way of managing external global state via \`useState\` and \`useEffect\` hooks and will NOT cause tearing in synchronous mode.`,
     },
     external_usesyncexternalstore: {
-      concurrent: `TODO`,
-      sync: `TODO`,
+      concurrent: `This is the new way of managing external global state via \`useSyncExternalStore\` and will NOT cause tearing. The tradeoff is that \`useSyncExternalStore\` will fallback to rendering in sync mode if it detects inconsistencies. It also will not work with React's new transition APIs. This is easy to see because the button never turns grey after the user clicks it.`,
+      sync: `This works in synchronous mode but isn't necessary and doesn't do anything different then the naive \`useState\` and \`useEffect\` approach.`,
     },
     context: {
-      concurrent: `TODO`,
-      sync: `TODO`,
+      concurrent: `This uses React's context API to manage global state and will NOT cause tearing. It also works with React's new transition APIs. The reason why this approach is not more popular, though, is because React's \`useContext\` does not allow fine-grained reactivity and will cause unnecessary rerenders in components that only need to access a slice of the store.`,
+      sync: `This uses React's context API to manage global state and will NOT cause tearing. In sync mode (and probably in concurrent mode too), this is never a recommended way of managing global state due to rerender concerns.`,
     },
   },
 } as any;
