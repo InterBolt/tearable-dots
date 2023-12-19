@@ -5,7 +5,7 @@ const copy = {
     "https://media1.tenor.com/m/8gnVs88HeMEAAAAd/spongebob-sandy-cheeks.gif",
   twitterLink: "https://twitter.com/interbolt_colin",
   blogLink: "https://interbolt.org/blog/react-ui-tearing/",
-  githubLink: "https://interbolt.org/blog/react-ui-tearing/",
+  githubLink: "https://github.com/InterBolt/tearable-dots",
   headlines: {
     external_managed: "external store tracked via `useEffect` and `useState`",
     external_usesyncexternalstore:

@@ -201,21 +201,7 @@ export const MainAbout = () => {
           opacity: 0.8,
         }}
       >
-        The demo at the bottom includes a green button, a column of five dots to
-        simulate expensive renders, and an event log to review what exactly is
-        happening internally.
-      </p>
-      <p
-        style={{
-          fontFamily: "monospace",
-          lineHeight: "1.65",
-          fontSize: "14px",
-          margin: "20px 0px 0px 0px",
-          padding: "0px 0px 0px 0px",
-          opacity: 0.8,
-        }}
-      >
-        The demo includes synchronous render-blocking code within the dot
+        The demo below includes synchronous render-blocking code within the dot
         components, and then shows what happens when the global state store is
         modified while those render functions are yielding.{" "}
         <strong>
@@ -250,9 +236,8 @@ export const MainAbout = () => {
           opacity: 0.8,
         }}
       >
-        <a href={copy.githubLink}>
-          Source code (I'll clean it if people are interested)
-        </a>
+        <a href={copy.githubLink}>Source code</a>
+        (I'll clean it if people are interested)
       </p>
     </div>
   );
