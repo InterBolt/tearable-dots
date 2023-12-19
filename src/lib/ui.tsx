@@ -1,5 +1,11 @@
-import React, { memo, useEffect, useMemo, useState } from "react";
-import log, { containerId } from "./log";
+import React, {
+  memo,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
+import { mountLog, infoLog, infoLogBlack } from "./log";
 import copy from "../copy";
 import * as ContextStrategy from "../strategies/context";
 import * as UseSyncExternalStoreStrategy from "../strategies/use-sync-external-store";
@@ -14,6 +20,7 @@ import {
   ScreenContainer,
 } from "./sections";
 import styles from "./styles";
+import { dotBlockTime } from "./constants";
 
 export const getStrategyModule = (state: string) => {
   const {
@@ -53,18 +60,36 @@ export const getStrategy = (search: string) => {
   };
 };
 
-export const useStrategy = () => {
+export const useStrategyModule = () => {
   const currentStrategy = useMemo(
     () => getStrategy(document.location.search),
     []
   );
 
-  const memoizedStrategy = useMemo(
-    () => getStrategyModule(currentStrategy.params.state),
-    [currentStrategy.params.state]
-  );
+  return getStrategyModule(currentStrategy.params.state);
+};
 
-  return memoizedStrategy;
+export const useRenderLog = (name: string, blockTime?: number) => {
+  if (blockTime) {
+    const start = performance.now();
+    while (performance.now() - start < blockTime) {
+      // empty
+    }
+  }
+
+  useEffect(() => {
+    infoLogBlack(name, "rendered");
+  });
+
+  useLayoutEffect(() => {
+    mountLog(name, "mounted");
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      mountLog(name, "unmounted");
+    };
+  }, []);
 };
 
 const Dot = memo(
@@ -86,63 +111,26 @@ const Dot = memo(
   }
 );
 
-export const useRenderLog = (name: string, blockTime?: number) => {
-  const start = performance.now();
-  log(
-    `<span style="color: black;">${name}<span style="color: gray;"> render started</span>`
-  );
-
-  if (blockTime) {
-    const start = performance.now();
-    const blockTime = 300;
-    while (performance.now() - start < blockTime) {
-      // empty
-    }
-  }
-
-  useEffect(() => {
-    log(
-      `<span style="color: gray;"><span style="color: black;">${name}</span> render completed</span>`
-    );
-  });
-};
-
 const ExpensiveDot = memo(({ index }: any) => {
-  const { useColor } = useStrategy();
+  infoLog("dot #" + index, "rendering");
+  useRenderLog("dot #" + index, dotBlockTime * index);
 
+  const { useColor } = useStrategyModule();
   const color = useColor();
-
-  useRenderLog("dot #" + index, 300);
-
-  useEffect(() => {
-    return () =>
-      log(
-        `<span style="color: black;">dot #${index}<span style="color: purple;"> unmounting</span></span>`
-      );
-  }, []);
 
   return <Dot color={color} index={index} />;
 });
 
-const dots: any = [1, 2, 3, 4, 5];
+const dots: any = [1, 2, 3];
 
 export const Screen = ({
   pendingTransition,
   onUpdate,
-  onUnsafeUpdate,
-  expectedColor,
-  color,
 }: {
   pendingTransition: boolean;
   onUpdate: () => void;
-  onUnsafeUpdate: () => void;
-  expectedColor: "red" | "blue";
-  color: "red" | "blue";
 }) => {
   const [showDots, setShowDots] = useState(false);
-  const [init, setInit] = useState(false);
-  const [showGif, setShowGif] = useState(false);
-  const [hideFirstDot, setHideFirstDot] = useState(false);
   const currentStrategy = useMemo(() => {
     return getStrategy(document.location.search);
   }, []);
@@ -150,42 +138,8 @@ export const Screen = ({
   useEffect(() => {
     setTimeout(() => {
       setShowDots(true);
-    }, 50);
+    }, 100);
   }, []);
-
-  useEffect(() => {
-    if (pendingTransition) {
-      setShowGif(false);
-      setHideFirstDot(true);
-      setTimeout(() => {
-        onUnsafeUpdate();
-        log(
-          `<span style="color: gray;"><span style="color: red;">TEARING ATTEMPT</span>: set color to {<span style="color: ${color};">${color}</span>}</span>`
-        );
-      }, 200);
-      setTimeout(() => {
-        setHideFirstDot(false);
-      }, 700);
-    } else {
-      if (init && currentStrategy.params.state === "external_managed") {
-        setShowGif(true);
-      }
-      setInit(true);
-      log(
-        `<span style="color: gray;"><span style="color: green;">transition</span> complete</span>`
-      );
-    }
-  }, [pendingTransition]);
-
-  const renderedDots = showDots
-    ? dots.map((key: number) =>
-        hideFirstDot && key === 1 ? (
-          <Dot color="gray" index={key} />
-        ) : (
-          <ExpensiveDot key={key} index={key} />
-        )
-      )
-    : null;
 
   return (
     <ScreenContainer>
@@ -215,9 +169,14 @@ export const Screen = ({
               currentStrategy={currentStrategy}
               pendingTransition={pendingTransition}
               onUpdate={onUpdate}
-              expectedColor={expectedColor}
-              renderedDots={renderedDots}
-              showGif={showGif}
+              renderedDots={
+                showDots
+                  ? dots.map((key: number) => (
+                      <ExpensiveDot key={key} index={key} />
+                    ))
+                  : null
+              }
+              showGif={false}
             />
             <LifecycleEventLog currentStrategy={currentStrategy} />
           </div>

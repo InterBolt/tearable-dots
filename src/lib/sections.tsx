@@ -71,13 +71,15 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
             }}
           >
             Tearable Dots -{" "}
-            <span style={{ fontSize: 28 }}>
-              state tearing attempts in React 18
+            <span style={{ fontSize: 25 }}>
+              a state tearing attempt tested against different global state
+              solutions in React 18
             </span>
           </h1>
           <p
             style={{
-              fontSize: 14,
+              fontStyle: "italic",
+              fontSize: 12,
               fontFamily: "monospace",
               color: "rgba(0, 0, 0, .85)",
               margin: "20px 0px 0px 0px",
@@ -85,7 +87,7 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
               lineHeight: "1.7rem",
             }}
           >
-            Demo UI at the bottom.
+            Demo at the bottom
           </p>
           <p
             style={{
@@ -97,13 +99,17 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
               padding: "0px 0px 0px 0px",
             }}
           >
-            <strong>Why:</strong> I wanted to understand everything about state
-            tearing in React concurrent mode after reading this{" "}
+            <strong>Summary:</strong> An interactive demo modelled after{" "}
+            <a href="https://twitter.com/rickhanlonii">@rickhanlonii</a>'s{" "}
             <a href="https://github.com/reactwg/react-18/discussions/69">
-              github discussion
+              discussion on github
+            </a>{" "}
+            and inspired by{" "}
+            <a href="https://twitter.com/tannerlinsley">Tanner Linsley's</a>{" "}
+            post on twitter about the same topic:{" "}
+            <a href="https://twitter.com/tannerlinsley/status/1732474127712481371">
+              https://twitter.com/tannerlinsley/status/1732474127712481371
             </a>
-            . This demo was built to help understand tradeoffs between various
-            global state management strategies in concurrent and sync mode.
           </p>
         </div>
       </div>
@@ -204,30 +210,11 @@ export const MainAbout = () => {
           opacity: 0.8,
         }}
       >
-        The demo below includes synchronous render-blocking code within the dot
-        components, and then shows what happens when the global state store is
-        modified while those render functions are yielding.{" "}
-        <strong>
-          The only time state tearing occurs in the demo below is when an
-          external store is used without the `useSyncExternalStore` hook
-          provided by React 18
-        </strong>
-        . Nonetheless, even though the other strategies don't cause tearing,
-        their solutions to prevent it introduce other tradeoffs that are worth
-        understanding. See the strategy/mode desriptions below for more details
-        or read the <a href={copy.blogLink}>blog post I wrote</a> that goes in
-        to much more depth.
-      </p>
-      <p
-        style={{
-          fontFamily: "monospace",
-          margin: "20px 0px 0px 0px",
-          padding: "0px 0px 0px 0px",
-          fontWeight: "bold",
-          opacity: 0.8,
-        }}
-      >
-        <a href={copy.twitterLink}>My twitter</a>
+        The demo below renders 3 dots, each of which include render blocking
+        code to simulate expensive renders, and a button to toggle the colors of
+        the dots. The idea is to attempt a state tearing update in between the
+        first and second dot renders. If the tearing attempt worked, the first
+        dot's final color will not match the color of the second two dots.
       </p>
       <p
         style={{
@@ -239,8 +226,35 @@ export const MainAbout = () => {
           opacity: 0.8,
         }}
       >
+        It's important to note that state tearing will only occur in one of the
+        scenarios, but I included several other global state strategies to show
+        how their solutions introduce new tradeoffs. For example, React's new{" "}
+        <a href="https://react.dev/reference/react/useSyncExternalStore">
+          useSyncExternalStore
+        </a>{" "}
+        does not support the transition API and falls back to synchronous
+        rendering if inconsistencies are detected. This is visible in the demo
+        because the button never turns grey after the user clicks it.
+      </p>
+      <p
+        style={{
+          fontFamily: "monospace",
+          margin: "20px 0px 0px 0px",
+          padding: "0px 0px 0px 0px",
+          fontWeight: "bold",
+          opacity: 0.8,
+        }}
+      >
+        <a style={{ marginRight: 15 }} href={copy.blogLink}>
+          Learn more about state tearing
+        </a>
+        {"  "}
+        <a style={{ marginRight: 15 }} href={copy.twitterLink}>
+          My twitter
+        </a>
+
+        {"  "}
         <a href={copy.githubLink}>Source code</a>
-        (I'll clean it if people are interested)
       </p>
     </div>
   );
@@ -327,14 +341,12 @@ export const DotsAndButton = ({
   currentStrategy,
   pendingTransition,
   onUpdate,
-  expectedColor,
   renderedDots,
   showGif,
 }: {
   currentStrategy: Strategy;
   pendingTransition: boolean;
   onUpdate: () => void;
-  expectedColor: "blue" | "red";
   renderedDots: any;
   showGif: boolean;
 }) => {
@@ -444,8 +456,7 @@ export const DotsAndButton = ({
               id="transitionIncrement"
               onClick={onUpdate}
             >
-              Toggle color from {expectedColor} to{" "}
-              {expectedColor === "blue" ? "red" : "blue"}
+              Toggle color
             </button>
           )}
           <div

@@ -22,6 +22,10 @@ export const useColor = () => {
     () => store.color
   );
 
+  if (syncColor !== store.color) {
+    return store.color;
+  }
+
   return syncColor;
 };
 

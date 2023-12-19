@@ -35,4 +35,38 @@ const log = (message: string, description?: string) => {
   }
 };
 
+export const tearingLog = (prefix: string, text: string) =>
+  log(`
+    <span style="color: red;">${prefix}</span>
+    <span style="color: gray;">${text}</span>
+  `);
+
+export const transitionLog = (text: string) =>
+  log(`
+    <span style="color: green;">${text}</span>
+  `);
+
+export const mountLog = (prefix: string, text: string) =>
+  log(`
+    <span style="color: blue;">${prefix}</span>
+    <span style="color: purple;">${text}</span>
+  `);
+
+export const infoLog = (prefix: string, text: string) =>
+  log(`
+    <span style="color: blue;">${prefix}</span>
+    <span style="color: gray;">${text}</span>
+  `);
+
+export const infoLogBlack = (prefix: string, text: string) =>
+  log(`
+    <span style="color: blue;">${prefix}</span>
+    <span style="color: gray;">${text}</span>
+  `);
+
+export const mainLog = (text: string) =>
+  log(`
+    <span style="color: black;">${text}</span>
+  `);
+
 export default log;

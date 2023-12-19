@@ -1,61 +1,92 @@
-import React, { useEffect, useTransition } from "react";
+import React, { useEffect, useRef, useTransition } from "react";
 import mountApp from "./lib/mountApp";
-import log from "./lib/log";
-import { Screen, useRenderLog, useStrategy } from "./lib/ui";
+import { tearingLog, transitionLog } from "./lib/log";
+import { Screen, getStrategy, useRenderLog, useStrategyModule } from "./lib/ui";
 
 const getNextColor = (color: "red" | "blue") =>
   color === "red" ? "blue" : "red";
 
+const useLogTransition = (pendingTransition: boolean) => {
+  const previous = useRef(null);
+  useEffect(() => {
+    if (pendingTransition && String(previous.current) !== "null") {
+      transitionLog("transition started");
+      previous.current = pendingTransition;
+    } else if (previous.current === true) {
+      transitionLog("transition ended");
+      previous.current = false;
+    } else {
+      previous.current = pendingTransition;
+    }
+  }, [pendingTransition]);
+};
+
 const App = () => {
-  const { useColor, useChangeHandler, useUnsafeChangeHandler } = useStrategy();
+  const { useColor, useChangeHandler, useUnsafeChangeHandler } =
+    useStrategyModule();
   // React 18 API that allows us to start a transition
   // where state updates within a transition can only trigger
   // a deprioritized render. A deprioritized render might yield
   // to other work.
+  const isSyncMode =
+    getStrategy(document.location.search).params.mode === "sync";
   const [pendingTransition, startTransition] = useTransition();
 
   // We use this to show the "expected" value of color
   const color = useColor();
 
-  const [expectedColor, setExpectedColor] = React.useState(color);
-
-  // Happy path state update
+  // update that uses the state interface
   const handleChange = useChangeHandler();
 
-  // A state update that bypasses the state interface
+  // update that bypasses the state interface
   const handleUnsafeChange = useUnsafeChangeHandler();
 
   const setupNextColor = () => {
     const nextColor = getNextColor(color);
-    setExpectedColor(nextColor);
     return nextColor;
   };
 
-  const handleUpdate = async () => {
-    // Determine the next color, set expected color, and
-    // clear the tearing dialogue alert.
+  const handleConcurrentUpdate = async () => {
     const nextColor = setupNextColor();
-
-    // This will start a transition and begin work on a render
-    // of 10 dots that each simulate blocking work.
     startTransition(() => {
-      log(
-        `<span style="color: green;">\`startTransition\` executing change to {<span style="color: ${nextColor};">${nextColor}</span>}</span>`
-      );
       handleChange(nextColor);
     });
+    setTimeout(() => {
+      const tearingColor = nextColor === "red" ? "blue" : "red";
+      handleUnsafeChange(tearingColor);
+      tearingLog(
+        "TEARING ATTEMPT",
+        `changing color to {<span style="color: ${color};">${color}</span>}`
+      );
+    }, 1);
   };
 
-  useRenderLog("demo container");
+  const handleSyncUpdate = async () => {
+    const nextColor = setupNextColor();
+    handleChange(nextColor);
+    setTimeout(() => {
+      const tearingColor = nextColor === "red" ? "blue" : "red";
+      handleUnsafeChange(tearingColor);
+      tearingLog(
+        "TEARING ATTEMPT",
+        `changing color to {<span style="color: ${color};">${color}</span>}`
+      );
+    }, 1);
+  };
+
+  const handleUpdate = async () => {
+    if (isSyncMode) {
+      handleSyncUpdate();
+    } else {
+      handleConcurrentUpdate();
+    }
+  };
+
+  useRenderLog("app");
+  useLogTransition(pendingTransition);
 
   return (
-    <Screen
-      pendingTransition={pendingTransition}
-      onUpdate={handleUpdate}
-      onUnsafeUpdate={() => handleUnsafeChange(color)}
-      expectedColor={expectedColor}
-      color={color}
-    />
+    <Screen onUpdate={handleUpdate} pendingTransition={pendingTransition} />
   );
 };
 

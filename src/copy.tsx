@@ -55,15 +55,15 @@ const copy = {
   },
   strategies: {
     external_managed: {
-      concurrent: `This uses the old way of managing external global state via \`useState\` and \`useEffect\` hooks and will cause tearing. The first dot is rerendered after the store is modified mid-render, resulting in the first dot using a version of the store that is inconsistent with the other dots.`,
-      sync: `This uses the old way of managing external global state via \`useState\` and \`useEffect\` hooks and will NOT cause tearing in synchronous mode.`,
+      concurrent: `This works in sync mode but will cause tearing in concurrent mode. Because it supports the transition API, the tearing attempt will occur mid-render instead of waiting for the the dot renders to complete.`,
+      sync: `This works because it does not make use of the transition API and will wait for the dot renders to complete before making the tearing attempt.`,
     },
     external_usesyncexternalstore: {
       concurrent: `This is the new way of managing external global state via \`useSyncExternalStore\` and will NOT cause tearing. The tradeoff is that \`useSyncExternalStore\` will fallback to rendering in sync mode if it detects inconsistencies. It also will not work with React's new transition APIs. This is easy to see because the button never turns grey after the user clicks it.`,
-      sync: `This works in synchronous mode but isn't necessary and doesn't do anything different then the naive \`useState\` and \`useEffect\` approach.`,
+      sync: `This works in synchronous mode but isn't necessary since synchronous renders should result in the consistent state.`,
     },
     context: {
-      concurrent: `This uses React's context API to manage global state and will NOT cause tearing. It also works with React's new transition APIs. The reason why this approach is not more popular, though, is because React's \`useContext\` does not allow fine-grained reactivity and will cause unnecessary rerenders in components that only need to access a slice of the store.`,
+      concurrent: `This uses React's context API to manage state and will NOT cause tearing. It also works with React's new transition APIs. The reason why this approach is not more popular, though, is because React's \`useContext\` does not allow fine-grained reactivity and will cause unnecessary rerenders in components that only need to access a slice of the store.`,
       sync: `This uses React's context API to manage global state and will NOT cause tearing. In sync mode (and probably in concurrent mode too), this is never a recommended way of managing global state due to rerender concerns.`,
     },
   },

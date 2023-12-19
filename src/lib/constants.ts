@@ -1,1 +1,1 @@
-export const dotBlockTime = 300;
+export const dotBlockTime = 150;

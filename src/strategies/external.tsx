@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 const store = {
   color: "red",
@@ -28,6 +28,10 @@ export const useColor = () => {
       setColor(store.color);
     });
   }, []);
+
+  if (store.color !== color) {
+    return store.color;
+  }
 
   return color;
 };
