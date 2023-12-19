@@ -70,7 +70,10 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
               padding: "0px 0px 0px 0px",
             }}
           >
-            Tearable Dots - Global State in React
+            Tearable Dots -{" "}
+            <span style={{ fontSize: 28 }}>
+              state tearing attempts in React 18
+            </span>
           </h1>
           <p
             style={{
