@@ -332,7 +332,7 @@ export const UiImportantNote = () => {
     >
       <strong>Important: </strong> the lifecycle events below the dots section
       will tell you exactly what is happening with the render lifecyle under the
-      hood. When state tearing occurs look out for a spongebob GIF.
+      hood.
     </p>
   );
 };
