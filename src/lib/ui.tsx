@@ -86,23 +86,40 @@ const Dot = memo(
   }
 );
 
+export const useRenderLog = (name: string, blockTime?: number) => {
+  const start = performance.now();
+  log(
+    `<span style="color: black;">${name}<span style="color: gray;"> render started</span>`
+  );
+
+  if (blockTime) {
+    const start = performance.now();
+    const blockTime = 300;
+    while (performance.now() - start < blockTime) {
+      // empty
+    }
+  }
+
+  useEffect(() => {
+    log(
+      `<span style="color: gray;"><span style="color: black;">${name}</span> render completed</span>`
+    );
+  });
+};
+
 const ExpensiveDot = memo(({ index }: any) => {
   const { useColor } = useStrategy();
 
-  log(
-    `<span style="color: gray;"><span style="color: orange;">blocking</span> begin -</span> dot #${index}`
-  );
   const color = useColor();
 
-  const start = performance.now();
-  const blockTime = 100 * index;
-  while (performance.now() - start < blockTime) {
-    // empty
-  }
+  useRenderLog("dot #" + index, 300);
 
-  log(
-    `<span style="color: gray;"><span style="color: orange;">blocking</span> over (rendering immediately after this) -</span> dot #${index}`
-  );
+  useEffect(() => {
+    return () =>
+      log(
+        `<span style="color: black;">dot #${index}<span style="color: purple;"> unmounting</span></span>`
+      );
+  }, []);
 
   return <Dot color={color} index={index} />;
 });
@@ -140,20 +157,14 @@ export const Screen = ({
     if (pendingTransition) {
       setShowGif(false);
       setHideFirstDot(true);
-      log(
-        `<span style="color: gray;"><span style="color: purple;">unmounting</span> first dot</span>`
-      );
       setTimeout(() => {
         onUnsafeUpdate();
         log(
-          `<span style="color: gray;"><span style="color: red;">tearing attempt</span>: set color to {<span style="color: ${color};">${color}</span>}</span>`
+          `<span style="color: gray;"><span style="color: red;">TEARING ATTEMPT</span>: set color to {<span style="color: ${color};">${color}</span>}</span>`
         );
       }, 200);
       setTimeout(() => {
         setHideFirstDot(false);
-        log(
-          `<span style="color: gray;"><span style="color: purple;">remounting</span> first dot</span>`
-        );
       }, 700);
     } else {
       if (init && currentStrategy.params.state === "external_managed") {

@@ -1,7 +1,7 @@
-import React, { useTransition } from "react";
+import React, { useEffect, useTransition } from "react";
 import mountApp from "./lib/mountApp";
 import log from "./lib/log";
-import { Screen, useStrategy } from "./lib/ui";
+import { Screen, useRenderLog, useStrategy } from "./lib/ui";
 
 const getNextColor = (color: "red" | "blue") =>
   color === "red" ? "blue" : "red";
@@ -36,15 +36,17 @@ const App = () => {
     // clear the tearing dialogue alert.
     const nextColor = setupNextColor();
 
-    log(
-      `<span style="color: green;">transition began to {<span style="color: ${nextColor};">${nextColor}</span>}</span>`
-    );
     // This will start a transition and begin work on a render
     // of 10 dots that each simulate blocking work.
     startTransition(() => {
+      log(
+        `<span style="color: green;">\`startTransition\` executing change to {<span style="color: ${nextColor};">${nextColor}</span>}</span>`
+      );
       handleChange(nextColor);
     });
   };
+
+  useRenderLog("demo container");
 
   return (
     <Screen
