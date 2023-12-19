@@ -58,7 +58,7 @@ const App = () => {
         "TEARING ATTEMPT",
         `changing color to {<span style="color: ${color};">${color}</span>}`
       );
-    }, 1);
+    }, 50);
   };
 
   const handleSyncUpdate = async () => {
@@ -71,7 +71,7 @@ const App = () => {
         "TEARING ATTEMPT",
         `changing color to {<span style="color: ${color};">${color}</span>}`
       );
-    }, 1);
+    }, 50);
   };
 
   const handleUpdate = async () => {
