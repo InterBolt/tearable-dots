@@ -46,8 +46,6 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
           backgroundColor: "white",
           borderColor: "rgba(255, 255, 255, .2)",
           marginBottom: "30px",
-          // ["-webkit-box-sizing"]: "border-box",
-          // ["-moz-box-sizing"]: "border-box",
         }}
       >
         <div

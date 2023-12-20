@@ -24,21 +24,15 @@ const useLogTransition = (pendingTransition: boolean) => {
 const App = () => {
   const { useColor, useChangeHandler, useUnsafeChangeHandler } =
     useStrategyModule();
-  // React 18 API that allows us to start a transition
-  // where state updates within a transition can only trigger
-  // a deprioritized render. A deprioritized render might yield
-  // to other work.
+
   const isSyncMode =
     getStrategy(document.location.search).params.mode === "sync";
   const [pendingTransition, startTransition] = useTransition();
 
-  // We use this to show the "expected" value of color
   const color = useColor();
 
-  // update that uses the state interface
   const handleChange = useChangeHandler();
 
-  // update that bypasses the state interface
   const handleUnsafeChange = useUnsafeChangeHandler();
 
   const setupNextColor = () => {
