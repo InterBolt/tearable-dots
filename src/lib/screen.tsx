@@ -18,7 +18,7 @@ import {
   DotsAndButton,
   LifecycleEventLog,
   ScreenContainer,
-} from "./sections";
+} from "./ui-sections";
 import styles from "./styles";
 import { dotBlockTime } from "./constants";
 

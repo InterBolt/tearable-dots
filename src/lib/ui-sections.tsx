@@ -1,5 +1,5 @@
 import React from "react";
-import { getStrategy } from "./ui";
+import { getStrategy } from "./screen";
 import copy from "../copy";
 import styles from "./styles";
 import { containerId } from "./log";
@@ -31,6 +31,7 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
         justifyContent: "center",
         width: "100%",
         paddingBottom: 30,
+        overflowX: "hidden",
         background:
           "linear-gradient(197deg, rgba(93,115,165,1) 0%, rgba(77,95,134,1) 58%, rgba(39,46,63,1) 100%)",
       }}
@@ -106,7 +107,7 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
             <a href="https://twitter.com/tannerlinsley">Tanner Linsley's</a>{" "}
             post on twitter about the same topic:{" "}
             <a href="https://twitter.com/tannerlinsley/status/1732474127712481371">
-              https://twitter.com/tannerlinsley/status/1732474127712481371
+              https://twitter.com/tannerlinsley/s...
             </a>
           </p>
         </div>
@@ -234,26 +235,60 @@ export const MainAbout = () => {
         rendering if inconsistencies are detected. This is visible in the demo
         because the button never turns grey after the user clicks it.
       </p>
-      <p
+      <div
         style={{
-          fontFamily: "monospace",
-          margin: "20px 0px 0px 0px",
-          padding: "0px 0px 0px 0px",
-          fontWeight: "bold",
-          opacity: 0.8,
+          marginTop: 20,
         }}
       >
-        <a style={{ marginRight: 15 }} href={copy.blogLink}>
+        <a
+          style={{
+            fontFamily: "monospace",
+            margin: "20px 0px 0px 0px",
+            padding: "0px 0px 0px 0px",
+            fontWeight: "bold",
+            opacity: 0.8,
+          }}
+          href={copy.blogLink}
+        >
           Learn more about state tearing
         </a>
-        {"  "}
-        <a style={{ marginRight: 15 }} href={copy.twitterLink}>
+      </div>
+      <div
+        style={{
+          marginTop: 10,
+        }}
+      >
+        <a
+          style={{
+            fontFamily: "monospace",
+            margin: "20px 0px 0px 0px",
+            padding: "0px 0px 0px 0px",
+            fontWeight: "bold",
+            opacity: 0.8,
+          }}
+          href={copy.twitterLink}
+        >
           My twitter
         </a>
-
-        {"  "}
-        <a href={copy.githubLink}>Source code</a>
-      </p>
+      </div>
+      <div
+        style={{
+          marginTop: 10,
+        }}
+      >
+        <a
+          style={{
+            fontFamily: "monospace",
+            margin: "20px 0px 0px 0px",
+            padding: "0px 0px 0px 0px",
+            fontWeight: "bold",
+            opacity: 0.8,
+          }}
+          href={copy.githubLink}
+        >
+          Source code
+        </a>
+      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import ReactDOM from "react-dom";
 import { mainLog } from "./log";
-import { getStrategy, getStrategyModule } from "./ui";
+import { getStrategy, getStrategyModule } from "./screen";
 
 const renderDOM = (App: any) => {
   window.onload = () => {

@@ -1,7 +1,12 @@
 import React, { useEffect, useRef, useTransition } from "react";
 import mountApp from "./lib/mountApp";
 import { tearingLog, transitionLog } from "./lib/log";
-import { Screen, getStrategy, useRenderLog, useStrategyModule } from "./lib/ui";
+import {
+  Screen,
+  getStrategy,
+  useRenderLog,
+  useStrategyModule,
+} from "./lib/screen";
 
 const getNextColor = (color: "red" | "blue") =>
   color === "red" ? "blue" : "red";
