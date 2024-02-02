@@ -16,6 +16,41 @@ export const ScreenContainer = ({ children }: { children: any }) => {
         width: "100%",
       }}
     >
+      <a
+        href="https://semanticcachehit.com"
+        style={{
+          textDecoration: "none",
+          position: "relative",
+          zIndex: 1000,
+          cursor: "pointer",
+          width: "100%",
+          lineHeight: "1.8",
+          textAlign: "center",
+          boxSizing: "border-box",
+          justifyContent: "center",
+          padding: 10,
+          fontSize: 14,
+          fontFamily: "monospace",
+          fontWeight: "bold",
+          color: "#17280b",
+          boxShadow:
+            "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);",
+          background:
+            "linear-gradient(197deg, #c5e898 0%, #b0de78 58%, #92cd4e 100%)",
+        }}
+      >
+        Like this demo? Check out my new one on{" "}
+        <span
+          style={{
+            textDecoration: "underline",
+            display: "inline-flex",
+            marginRight: 5,
+          }}
+        >
+          semantic caching
+        </span>
+        &#8594;
+      </a>
       {children}
     </div>
   );
@@ -33,7 +68,7 @@ export const Banner = ({ currentStrategy }: { currentStrategy: Strategy }) => {
         paddingBottom: 30,
         overflowX: "hidden",
         background:
-          "linear-gradient(197deg, rgba(93,115,165,1) 0%, rgba(77,95,134,1) 58%, rgba(39,46,63,1) 100%)",
+          "linear-gradient(197deg, #0766ad 0%, #0a4f82 58%, #092a48 100%)",
       }}
     >
       <div
