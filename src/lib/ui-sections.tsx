@@ -17,7 +17,7 @@ export const ScreenContainer = ({ children }: { children: any }) => {
       }}
     >
       <a
-        href="https://semanticcachehit.com"
+        href="https://interbolt.ck.page/8e222f4c7a"
         style={{
           textDecoration: "none",
           position: "relative",
@@ -39,17 +39,7 @@ export const ScreenContainer = ({ children }: { children: any }) => {
             "linear-gradient(197deg, #c5e898 0%, #b0de78 58%, #92cd4e 100%)",
         }}
       >
-        Like this demo? Check out my new one on{" "}
-        <span
-          style={{
-            textDecoration: "underline",
-            display: "inline-flex",
-            marginRight: 5,
-          }}
-        >
-          semantic caching
-        </span>
-        &#8594;
+        Like this demo? Subscribe for a new one each month &#8594;
       </a>
       {children}
     </div>
